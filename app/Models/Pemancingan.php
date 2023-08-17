@@ -25,4 +25,14 @@ class Pemancingan extends Model
         'lokasi',
         'status'
     ];
+
+    public function userPemancingan()
+    {
+        return $this->belongsTo(User::class, "id_user", "id");
+    }
+
+    public function acaraPemancingan()
+    {
+        return $this->hasMany(Acara::class, "id", "id_pemancingan");
+    }
 }

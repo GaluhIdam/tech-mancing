@@ -33,7 +33,13 @@ Route::middleware('auth:sanctum')->group(
 
         //Getting Pemancingan
         Route::get('pemancingan', [PemancinganController::class, 'index']);
+        //Getting Pemancingan by ID
+        Route::get('pemancingan/{id}', [PemancinganController::class, 'show']);
         //Creating Pemancingan
         Route::post('pemancingan', [PemancinganController::class, 'store']);
+        //Updating Pemancingan
+        Route::post('pemancingan/{id}', [PemancinganController::class, 'update']);
+        //Deleting Pemancingan
+        Route::delete('pemancingan/{id}', [PemancinganController::class, 'destroy']);
     }
 );
