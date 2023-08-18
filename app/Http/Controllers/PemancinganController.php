@@ -108,11 +108,18 @@ class PemancinganController extends Controller
     public function show($id)
     {
         $data = Pemancingan::with('userPemancingan', 'acaraPemancingan')->where('id', $id)->first();
-        return response()->json([
-            'message' => 'Getting Pemancingan Data is Successfully!',
-            'status' => 200,
-            'data' => $data
-        ], 200);
+        if ($data) {
+            return response()->json([
+                'message' => 'Getting Pemancingan Data is Successfully!',
+                'status' => 200,
+                'data' => $data
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Sorry, Data with ' . $id . ' not found',
+                'status' => 404,
+            ]);
+        }
     }
 
     /**

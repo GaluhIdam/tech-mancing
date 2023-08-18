@@ -16,8 +16,8 @@ return new class extends Migration
             $table->unsignedBigInteger('id_pemancingan');
             $table->string('nama_acara');
             $table->string('deskripsi');
-            $table->dateTime('mulai');
-            $table->dateTime('akhir');
+            $table->date('mulai');
+            $table->date('akhir');
             $table->timestamps();
 
             $table->foreign('id_pemancingan')->references('id')->on('pemancingan');
