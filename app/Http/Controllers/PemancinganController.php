@@ -29,7 +29,7 @@ class PemancinganController extends Controller
             $paginate = 10;
         }
 
-        $data = Pemancingan::with('userPemancingan')->when($search, function ($query) use ($search) {
+        $data = Pemancingan::with('userPemancingan', 'komentarPemancingan')->when($search, function ($query) use ($search) {
             $query->where(function ($sub_query) use ($search) {
                 $sub_query->where('nama_pemancingan', 'LIKE', "%{$search}%")
                     ->orWhere('deskripsi', 'LIKE', "%{$search}%");
@@ -108,11 +108,18 @@ class PemancinganController extends Controller
     public function show($id)
     {
         $data = Pemancingan::with('userPemancingan', 'acaraPemancingan')->where('id', $id)->first();
-        return response()->json([
-            'message' => 'Getting Pemancingan Data is Successfully!',
-            'status' => 200,
-            'data' => $data
-        ], 200);
+        if ($data) {
+            return response()->json([
+                'message' => 'Getting Pemancingan Data is Successfully!',
+                'status' => 200,
+                'data' => $data
+            ], 200);
+        } else {
+            return response()->json([
+                'message' => 'Sorry, Data with ' . $id . ' not found',
+                'status' => 404,
+            ]);
+        }
     }
 
     /**

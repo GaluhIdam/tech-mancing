@@ -33,6 +33,11 @@ class Pemancingan extends Model
 
     public function acaraPemancingan()
     {
-        return $this->hasMany(Acara::class, "id", "id_pemancingan");
+        return $this->hasMany(Acara::class, "id");
+    }
+
+    public function komentarPemancingan()
+    {
+        return $this->hasMany(KomentarRate::class, "id");
     }
 }
