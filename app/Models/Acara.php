@@ -10,4 +10,12 @@ class Acara extends Model
     use HasFactory;
 
     protected $table = 'acara';
+
+    protected $fillable = [
+        'id_pemancingan',
+        'nama_acara',
+        'deskripsi',
+        'mulai',
+        'akhir',
+    ];
 }

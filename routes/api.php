@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\AcaraController;
+use App\Http\Controllers\KomentarRateController;
 use App\Http\Controllers\PemancinganController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -41,5 +43,25 @@ Route::middleware('auth:sanctum')->group(
         Route::post('pemancingan/{id}', [PemancinganController::class, 'update']);
         //Deleting Pemancingan
         Route::delete('pemancingan/{id}', [PemancinganController::class, 'destroy']);
+
+        //Getting Komentar Rate
+        Route::get('komentar-rate', [KomentarRateController::class, 'index']);
+        //Creating Komentar Rate
+        Route::post('komentar-rate', [KomentarRateController::class, 'create']);
+        //Updating Komentar Rate
+        Route::put('komentar-rate/{id}', [KomentarRateController::class, 'update']);
+        //Deleting Komentar Route
+        Route::delete('komentar-rate/{id}', [KomentarRateController::class, 'destroy']);
+
+        //Getting Acara
+        Route::get('acara', [AcaraController::class, 'index']);
+        //Getting Acara by ID
+        Route::get('acara/{id}', [AcaraController::class, 'show']);
+        //Creating Acara
+        Route::post('acara', [AcaraController::class, 'create']);
+        //Updating Acara
+        Route::put('acara/{id}', [AcaraController::class, 'update']);
+        //Deleting Acara
+        Route::delete('acara/{id}', [AcaraController::class, 'destroy']);
     }
 );

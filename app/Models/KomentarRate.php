@@ -10,4 +10,11 @@ class KomentarRate extends Model
     use HasFactory;
 
     protected $table = 'komentar_rate';
+
+    protected $fillable = [
+        'id_pemancingan',
+        'id_user',
+        'komentar',
+        'rate'
+    ];
 }
