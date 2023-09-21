@@ -76,23 +76,28 @@ class UserController extends Controller
         }
 
         $user = User::where('email', $request->get('email'))->first();
-
-        if ($user && Hash::check($request->get('password'), $user->password)) {
-            if (Auth::attempt(['email' => $request->get('email'), 'password' => $request->get('password')])) {
-                $token = Auth::user()->createToken('auth_token')->plainTextToken;
-                return response()->json([
-                    'message' => 'User Login has Successfully!',
-                    'data' => $user,
-                    'token' => $token,
-                ], 200);
+        if ($user) {
+            if (Hash::check($request->get('password'), $user->password)) {
+                if (Auth::attempt(['email' => $request->get('email'), 'password' => $request->get('password')])) {
+                    $token = Auth::user()->createToken('auth_token')->plainTextToken;
+                    return response()->json([
+                        'message' => 'User Login has Successfully!',
+                        'data' => $user,
+                        'token' => $token,
+                    ], 200);
+                } else {
+                    return response()->json([
+                        'message' => 'Login has Failed please cek your password!',
+                    ], 400);
+                }
             } else {
                 return response()->json([
-                    'message' => 'User Login has Failed please cek your password!',
+                    'message' => 'Login has Failed, please check your password!',
                 ], 400);
             }
         } else {
             return response()->json([
-                'message' => 'User Login has Failed, please check your email!',
+                'message' => 'Login has Failed, please check your email!',
             ], 400);
         }
     }
