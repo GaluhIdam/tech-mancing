@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('acara', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('id_pemancingan');
+            $table->string('gambar');
             $table->string('nama_acara');
             $table->string('deskripsi');
             $table->date('mulai');

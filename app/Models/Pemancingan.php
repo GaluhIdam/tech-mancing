@@ -23,7 +23,9 @@ class Pemancingan extends Model
         'kecamatan',
         'alamat',
         'lokasi',
-        'status'
+        'status',
+        'buka',
+        'tutup',
     ];
 
     public function userPemancingan()

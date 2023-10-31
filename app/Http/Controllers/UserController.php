@@ -111,4 +111,19 @@ class UserController extends Controller
             ], 200);
         }
     }
+
+    public function getUserByEmail(Request $request)
+    {
+        if (!$request->get('email')) {
+            return response()->json([
+                'message' => 'email is required!',
+            ], 400);
+        } else {
+            $users = User::where('email', $request->get('email'))->first();
+            return response()->json([
+                'message' => 'Getting User Data is Successfully!',
+                'data' => $users,
+            ], 200);
+        }
+    }
 }

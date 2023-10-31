@@ -13,16 +13,16 @@ class AcaraController extends Controller
      */
     public function index(Request $request)
     {
-        $orderBy = $request->get('orderBy', 'id');  // Default to 'id' if not provided
-        $sortBy = $request->get('sortBy', 'desc');  // Default to 'desc' if not provided
-        $paginate = $request->get('paginate', 10);  // Default to 10 if not provided
+        $orderBy = $request->get('orderBy', 'id'); // Default to 'id' if not provided
+        $sortBy = $request->get('sortBy', 'desc'); // Default to 'desc' if not provided
+        $paginate = $request->get('paginate', 10); // Default to 10 if not provided
 
         $data = Acara::orderBy($orderBy, $sortBy)->paginate($paginate);
 
         return response()->json([
             'message' => 'Getting Acara',
             'status' => 200,
-            'data' => $data
+            'data' => $data,
         ]);
     }
 
@@ -39,6 +39,7 @@ class AcaraController extends Controller
                 'deskripsi' => 'required|min:10',
                 'mulai' => 'required',
                 'akhir' => 'required',
+                'gambar' => 'required|mimes:jpg,jpeg,png|max:1048',
             ]
         );
 
@@ -46,11 +47,18 @@ class AcaraController extends Controller
             return response()->json($validator->errors(), 400);
         }
 
-        $data = Acara::create($request->all());
+        $data = Acara::create([
+            'id_pemancingan' => $request->input('id_pemancingan'),
+            'nama_acara' => $request->input('nama_acara'),
+            'deskripsi' => $request->input('deskripsi'),
+            'mulai' => $request->input('mulai'),
+            'akhir' => $request->input('akhir'),
+            'gambar' => $request->file('image')->storeAs('public/pemancingan', $request->file('image')->hashName()),
+        ]);
         return response()->json([
             'message' => 'Acara has Created!',
             'status' => 201,
-            'data' => $data
+            'data' => $data,
         ]);
     }
 
@@ -64,7 +72,7 @@ class AcaraController extends Controller
             return response()->json([
                 'message' => 'Getting Acara!',
                 'status' => 201,
-                'data' => $data
+                'data' => $data,
             ]);
         } else {
             return response()->json([
@@ -85,7 +93,7 @@ class AcaraController extends Controller
             return response()->json([
                 'message' => 'Acara has Updated!',
                 'status' => 201,
-                'data' => $data
+                'data' => $data,
             ]);
         } else {
             return response()->json([
@@ -106,7 +114,7 @@ class AcaraController extends Controller
             return response()->json([
                 'message' => 'Acara has Deleted!',
                 'status' => 201,
-                'data' => $data
+                'data' => $data,
             ]);
         } else {
             return response()->json([

@@ -15,12 +15,18 @@ class PemancinganController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
-        if ($request->get('order') && $request->get('by')) {
+        $status = $request->get('status');
+        $id_user = $request->get('id_user');
+        $isAdmin = $request->get('isAdmin');
+
+        if ($request->get('order') && $request->get('by') && $request->get('isAdmin')) {
             $order = $request->get('order');
             $by = $request->get('by');
+            $isAdmin = $request->get('isAdmin');
         } else {
             $order = 'id';
             $by = 'desc';
+            $isAdmin = 'false';
         }
 
         if ($request->get('paginate')) {
@@ -29,28 +35,59 @@ class PemancinganController extends Controller
             $paginate = 10;
         }
 
-        $data = Pemancingan::with('userPemancingan', 'komentarPemancingan')->when($search, function ($query) use ($search) {
-            $query->where(function ($sub_query) use ($search) {
-                $sub_query->where('nama_pemancingan', 'LIKE', "%{$search}%")
-                    ->orWhere('deskripsi', 'LIKE', "%{$search}%");
-            });
-        })->when(($order && $by), function ($query) use ($order, $by) {
-            $query->orderBy($order, $by);
-        })->paginate($paginate);
+        if ($isAdmin == 'false') {
+            $data = Pemancingan::with('userPemancingan', 'komentarPemancingan')
+                ->where('status', $status)
+                ->where('id_user', $id_user)
+                ->when($search, function ($query) use ($search) {
+                    $query->where(function ($sub_query) use ($search) {
+                        $sub_query->where('nama_pemancingan', 'LIKE', "%{$search}%")
+                            ->orWhere('deskripsi', 'LIKE', "%{$search}%");
+                    });
+                })->when(($order && $by), function ($query) use ($order, $by) {
+                    $query->orderBy($order, $by);
+                })->paginate($paginate);
 
-        $query_string = [
-            'search' => $search,
-            'order' => $order,
-            'by' => $by,
-        ];
+            $query_string = [
+                'search' => $search,
+                'order' => $order,
+                'by' => $by,
+            ];
 
-        $data->appends($query_string);
+            $data->appends($query_string);
 
-        return response()->json([
-            'message' => 'Getting Pemancingan Data is Successfully!',
-            'status' => 200,
-            'data' => $data
-        ], 200);
+            return response()->json([
+                'message' => 'Getting Pemancingan Data is Successfully!',
+                'status' => 200,
+                'data' => $data,
+            ], 200);
+        }
+        if ($isAdmin == 'true') {
+            $data = Pemancingan::with('userPemancingan', 'komentarPemancingan')
+                ->where('status', $status)
+                ->when($search, function ($query) use ($search) {
+                    $query->where(function ($sub_query) use ($search) {
+                        $sub_query->where('nama_pemancingan', 'LIKE', "%{$search}%")
+                            ->orWhere('deskripsi', 'LIKE', "%{$search}%");
+                    });
+                })->when(($order && $by), function ($query) use ($order, $by) {
+                    $query->orderBy($order, $by);
+                })->paginate($paginate);
+
+            $query_string = [
+                'search' => $search,
+                'order' => $order,
+                'by' => $by,
+            ];
+
+            $data->appends($query_string);
+
+            return response()->json([
+                'message' => 'Getting Pemancingan Data is Successfully!',
+                'status' => 200,
+                'data' => $data,
+            ], 200);
+        }
     }
 
     /**
@@ -70,6 +107,8 @@ class PemancinganController extends Controller
                 'kecamatan' => 'required',
                 'alamat' => 'required|min:10',
                 'lokasi' => 'required',
+                'buka' => 'required',
+                'tutup' => 'required',
             ]
         );
 
@@ -92,6 +131,8 @@ class PemancinganController extends Controller
             'kecamatan' => $request->get('kecamatan'),
             'alamat' => $request->get('alamat'),
             'lokasi' => $request->get('lokasi'),
+            'buka' => $request->get('buka'),
+            'tutup' => $request->get('tutup'),
             'status' => null
         ]);
 
@@ -194,6 +235,17 @@ class PemancinganController extends Controller
                 'message' => 'Sorry, Data with ' . $id . ' not found',
                 'status' => 404,
             ]);
+        }
+    }
+
+    public function showImage($filename)
+    {
+        $path = 'public/pemancingan/' . $filename;
+        if (Storage::exists($path)) {
+            $file = Storage::get($path);
+            return response($file, 200)->header('Content-Type', 'image/jpeg');
+        } else {
+            return response('Image not found', 404);
         }
     }
 }

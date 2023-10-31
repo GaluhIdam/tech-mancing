@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 //Register
 Route::post('register', [UserController::class, 'register']);
 
+Route::get('images/{filename}', [PemancinganController::class, 'showImage']);
+
 //Login
 Route::post('login', [UserController::class, 'login']);
 
@@ -32,6 +34,9 @@ Route::middleware('auth:sanctum')->group(
 
         //Getting User
         Route::get('users', [UserController::class, 'index']);
+
+        //Getting User By Email
+        Route::get('get-user', [UserController::class, 'getUserByEmail']);
 
         //Getting Pemancingan
         Route::get('pemancingan', [PemancinganController::class, 'index']);

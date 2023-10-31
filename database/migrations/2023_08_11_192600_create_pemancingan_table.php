@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('category');
             $table->string('image');
             $table->string('path');
+            $table->string('buka');
+            $table->string('tutup');
             $table->string('nama_pemancingan');
             $table->string('deskripsi');
             $table->string('provinsi');
