@@ -24,7 +24,7 @@ class PemancinganController extends Controller
             $by = $request->get('by');
             $isAdmin = $request->get('isAdmin');
         } else {
-            $order = 'id';
+            $order = 'updated_at';
             $by = 'desc';
             $isAdmin = 'false';
         }
@@ -36,7 +36,7 @@ class PemancinganController extends Controller
         }
 
         if ($isAdmin == 'false') {
-            $data = Pemancingan::with('userPemancingan', 'komentarPemancingan')
+            $data = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan')
                 ->where('status', $status)
                 ->where('id_user', $id_user)
                 ->when($search, function ($query) use ($search) {
@@ -63,7 +63,7 @@ class PemancinganController extends Controller
             ], 200);
         }
         if ($isAdmin == 'true') {
-            $data = Pemancingan::with('userPemancingan', 'komentarPemancingan')
+            $data = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan')
                 ->where('status', $status)
                 ->when($search, function ($query) use ($search) {
                     $query->where(function ($sub_query) use ($search) {
@@ -98,17 +98,22 @@ class PemancinganController extends Controller
         $validator = Validator::make(
             $request->all(),
             [
+                'id_user' => 'required',
                 'category' => 'required',
                 'image' => 'required|image|mimes:jpg,jpeg,png,svg|max:1048',
-                'nama_pemancingan' => 'required|min:5',
-                'deskripsi' => 'required|min:10',
+                'nama_pemancingan' => 'required',
+                'deskripsi' => 'required',
                 'provinsi' => 'required',
                 'kota' => 'required',
                 'kecamatan' => 'required',
-                'alamat' => 'required|min:10',
-                'lokasi' => 'required',
+                'alamat' => 'required',
                 'buka' => 'required',
                 'tutup' => 'required',
+                'latitude' => 'required',
+                'longitude' => 'required',
+                'id_provinsi' => 'required',
+                'id_kota' => 'required',
+                'id_kecamatan' => 'required',
             ]
         );
 
@@ -130,10 +135,15 @@ class PemancinganController extends Controller
             'kota' => $request->get('kota'),
             'kecamatan' => $request->get('kecamatan'),
             'alamat' => $request->get('alamat'),
-            'lokasi' => $request->get('lokasi'),
             'buka' => $request->get('buka'),
             'tutup' => $request->get('tutup'),
-            'status' => null
+            'latitude' => $request->get('latitude'),
+            'longitude' => $request->get('longitude'),
+            'id_provinsi' => $request->get('id_provinsi'),
+            'id_kota' => $request->get('id_kota'),
+            'id_kecamatan' => $request->get('id_kecamatan'),
+            'status' => null,
+            'pesan' => null,
         ]);
 
         return response()->json([
@@ -148,7 +158,7 @@ class PemancinganController extends Controller
      */
     public function show($id)
     {
-        $data = Pemancingan::with('userPemancingan', 'acaraPemancingan')->where('id', $id)->first();
+        $data = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan')->where('id', $id)->first();
         if ($data) {
             return response()->json([
                 'message' => 'Getting Pemancingan Data is Successfully!',
@@ -175,13 +185,19 @@ class PemancinganController extends Controller
                 [
                     'category' => 'required',
                     'image' => 'required|image|mimes:jpg,jpeg,png,svg|max:1048',
-                    'nama_pemancingan' => 'required|min:5',
-                    'deskripsi' => 'required|min:10',
+                    'nama_pemancingan' => 'required',
+                    'deskripsi' => 'required',
                     'provinsi' => 'required',
                     'kota' => 'required',
                     'kecamatan' => 'required',
-                    'alamat' => 'required|min:10',
-                    'lokasi' => 'required',
+                    'alamat' => 'required',
+                    'buka' => 'required',
+                    'tutup' => 'required',
+                    'latitude' => 'required',
+                    'longitude' => 'required',
+                    'id_provinsi' => 'required',
+                    'id_kota' => 'required',
+                    'id_kecamatan' => 'required',
                 ]
             );
             if ($validator->fails()) {
@@ -201,7 +217,15 @@ class PemancinganController extends Controller
                 'kota' => $request->get('kota'),
                 'kecamatan' => $request->get('kecamatan'),
                 'alamat' => $request->get('alamat'),
-                'lokasi' => $request->get('lokasi'),
+                'buka' => $request->get('buka'),
+                'tutup' => $request->get('tutup'),
+                'latitude' => $request->get('latitude'),
+                'longitude' => $request->get('longitude'),
+                'id_provinsi' => $request->get('id_provinsi'),
+                'id_kota' => $request->get('id_kota'),
+                'id_kecamatan' => $request->get('id_kecamatan'),
+                'status' => null,
+                'pesan' => null,
             ]);
             return response()->json([
                 'message' => 'Pemancingan Updated!',

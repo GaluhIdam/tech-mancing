@@ -22,10 +22,15 @@ class Pemancingan extends Model
         'kota',
         'kecamatan',
         'alamat',
-        'lokasi',
         'status',
         'buka',
         'tutup',
+        'pesan',
+        'latitude',
+        'longitude',
+        'id_provinsi',
+        'id_kota',
+        'id_kecamatan',
     ];
 
     public function userPemancingan()

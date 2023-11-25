@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Acara;
+use App\Models\Pemancingan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class AcaraController extends Controller
@@ -13,11 +15,35 @@ class AcaraController extends Controller
      */
     public function index(Request $request)
     {
-        $orderBy = $request->get('orderBy', 'id'); // Default to 'id' if not provided
-        $sortBy = $request->get('sortBy', 'desc'); // Default to 'desc' if not provided
-        $paginate = $request->get('paginate', 10); // Default to 10 if not provided
+        $orderBy = $request->get('orderBy', 'id');
+        $sortBy = $request->get('sortBy', 'desc');
+        $paginate = $request->get('paginate', 10);
 
         $data = Acara::orderBy($orderBy, $sortBy)->paginate($paginate);
+
+        return response()->json([
+            'message' => 'Getting Acara',
+            'status' => 200,
+            'data' => $data,
+        ]);
+    }
+
+
+    public function getByUser(Request $request, $id)
+    {
+        $search = $request->get('search');
+        if ($request->get('page') && $request->get('paginate')) {
+            $paginate = $request->get('paginate');
+        } else {
+            $paginate = 10;
+        }
+        $data = Acara::where('id_user', $id)->with('pemancinganAcara')
+            ->when($search, function ($query) use ($search) {
+                $query->where('nama_acara', 'like', '%' . $search . '%')
+                    ->orWhere('deskripsi',  'like', '%' . $search . '%');
+            })
+            ->orderBy('updated_at', 'desc')
+            ->paginate($paginate);
 
         return response()->json([
             'message' => 'Getting Acara',
@@ -35,10 +61,12 @@ class AcaraController extends Controller
             $request->all(),
             [
                 'id_pemancingan' => 'required',
-                'nama_acara' => 'required|min:5',
-                'deskripsi' => 'required|min:10',
+                'id_user' => 'required',
+                'nama_acara' => 'required',
+                'deskripsi' => 'required',
                 'mulai' => 'required',
                 'akhir' => 'required',
+                'grand_prize' => 'required',
                 'gambar' => 'required|mimes:jpg,jpeg,png|max:1048',
             ]
         );
@@ -48,13 +76,19 @@ class AcaraController extends Controller
         }
 
         $data = Acara::create([
-            'id_pemancingan' => $request->input('id_pemancingan'),
-            'nama_acara' => $request->input('nama_acara'),
-            'deskripsi' => $request->input('deskripsi'),
-            'mulai' => $request->input('mulai'),
-            'akhir' => $request->input('akhir'),
-            'gambar' => $request->file('image')->storeAs('public/pemancingan', $request->file('image')->hashName()),
+            'id_pemancingan' => $request->get('id_pemancingan'),
+            'id_user' => $request->get('id_user'),
+            'nama_acara' => $request->get('nama_acara'),
+            'deskripsi' => $request->get('deskripsi'),
+            'mulai' => $request->get('mulai'),
+            'akhir' => $request->get('akhir'),
+            'status' => null,
+            'grand_prize' => $request->get('grand_prize'),
+            'gambar' => $request->file('gambar')->hashName(),
+            'path' =>
+            $request->file('gambar')->storeAs('public/acara', $request->file('gambar')->hashName()),
         ]);
+        $request->file('gambar')->storeAs('public/acara', $request->file('gambar')->hashName());
         return response()->json([
             'message' => 'Acara has Created!',
             'status' => 201,
@@ -68,11 +102,12 @@ class AcaraController extends Controller
     public function show($id)
     {
         $data = Acara::where('id', $id)->first();
+        $pemancingan = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan')->where('id', $data->id_pemancingan)->first();
         if ($data) {
             return response()->json([
                 'message' => 'Getting Acara!',
                 'status' => 201,
-                'data' => $data,
+                'data' => $data->setAttribute('pemancingan_acara', $pemancingan),
             ]);
         } else {
             return response()->json([
@@ -87,13 +122,41 @@ class AcaraController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $data = Acara::where('id', $id)->first();
-        if ($data) {
-            $data->update($request->all());
+        $findData = Acara::where('id', $id)->first();
+        if ($findData) {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'id_pemancingan' => 'required',
+                    'nama_acara' => 'required',
+                    'deskripsi' => 'required',
+                    'mulai' => 'required',
+                    'akhir' => 'required',
+                    'grand_prize' => 'required',
+                    'gambar' => 'required|mimes:jpg,jpeg,png|max:1048',
+                ]
+            );
+
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), 400);
+            }
+            Storage::delete($findData->path);
+            $findData->update([
+                'id_pemancingan' => $request->get('id_pemancingan'),
+                'nama_acara' => $request->get('nama_acara'),
+                'deskripsi' => $request->get('deskripsi'),
+                'mulai' => $request->get('mulai'),
+                'akhir' => $request->get('akhir'),
+                'status' => null,
+                'grand_prize' => $request->get('grand_prize'),
+                'gambar' => $request->file('gambar')->hashName(),
+                'path' =>
+                $request->file('gambar')->storeAs('public/acara', $request->file('gambar')->hashName()),
+            ]);
             return response()->json([
                 'message' => 'Acara has Updated!',
                 'status' => 201,
-                'data' => $data,
+                'data' => $findData,
             ]);
         } else {
             return response()->json([
@@ -121,6 +184,17 @@ class AcaraController extends Controller
                 'message' => 'Sorry, Data with ' . $id . ' not found',
                 'status' => 404,
             ]);
+        }
+    }
+
+    public function showImage($filename)
+    {
+        $path = 'public/acara/' . $filename;
+        if (Storage::exists($path)) {
+            $file = Storage::get($path);
+            return response($file, 200)->header('Content-Type', 'image/jpeg');
+        } else {
+            return response('Image not found', 404);
         }
     }
 }

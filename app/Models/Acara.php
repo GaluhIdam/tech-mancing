@@ -13,9 +13,19 @@ class Acara extends Model
 
     protected $fillable = [
         'id_pemancingan',
+        'id_user',
+        'gambar',
+        'path',
         'nama_acara',
         'deskripsi',
+        'grand_prize',
         'mulai',
         'akhir',
+        'status'
     ];
+
+    public function pemancinganAcara()
+    {
+        return $this->belongsTo(Pemancingan::class, 'id_pemancingan', 'id');
+    }
 }

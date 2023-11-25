@@ -20,7 +20,8 @@ use Illuminate\Support\Facades\Route;
 //Register
 Route::post('register', [UserController::class, 'register']);
 
-Route::get('images/{filename}', [PemancinganController::class, 'showImage']);
+Route::get('images-pemancingan/{filename}', [PemancinganController::class, 'showImage']);
+Route::get('images-acara/{filename}', [AcaraController::class, 'showImage']);
 
 //Login
 Route::post('login', [UserController::class, 'login']);
@@ -62,10 +63,11 @@ Route::middleware('auth:sanctum')->group(
         Route::get('acara', [AcaraController::class, 'index']);
         //Getting Acara by ID
         Route::get('acara/{id}', [AcaraController::class, 'show']);
+        Route::get('acara-user/{id}', [AcaraController::class, 'getByUser']);
         //Creating Acara
         Route::post('acara', [AcaraController::class, 'create']);
         //Updating Acara
-        Route::put('acara/{id}', [AcaraController::class, 'update']);
+        Route::post('acara/{id}', [AcaraController::class, 'update']);
         //Deleting Acara
         Route::delete('acara/{id}', [AcaraController::class, 'destroy']);
     }

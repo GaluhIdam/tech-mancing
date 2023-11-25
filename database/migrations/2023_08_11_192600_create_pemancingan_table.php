@@ -21,11 +21,21 @@ return new class extends Migration
             $table->string('tutup');
             $table->string('nama_pemancingan');
             $table->string('deskripsi');
+
+            $table->string('id_provinsi');
             $table->string('provinsi');
+
+            $table->string('id_kota');
             $table->string('kota');
+
+
+            $table->string('id_kecamatan');
             $table->string('kecamatan');
+
             $table->string('alamat');
-            $table->string('lokasi');
+            $table->string('latitude');
+            $table->string('longitude');
+            $table->string('pesan')->nullable();
             $table->boolean('status')->nullable();
             $table->timestamps();
 
