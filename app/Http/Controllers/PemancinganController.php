@@ -15,19 +15,6 @@ class PemancinganController extends Controller
     public function index(Request $request)
     {
         $search = $request->get('search');
-        $status = $request->get('status');
-        $id_user = $request->get('id_user');
-        $isAdmin = $request->get('isAdmin');
-
-        if ($request->get('order') && $request->get('by') && $request->get('isAdmin')) {
-            $order = $request->get('order');
-            $by = $request->get('by');
-            $isAdmin = $request->get('isAdmin');
-        } else {
-            $order = 'updated_at';
-            $by = 'desc';
-            $isAdmin = 'false';
-        }
 
         if ($request->get('paginate')) {
             $paginate = $request->get('paginate');
@@ -35,59 +22,82 @@ class PemancinganController extends Controller
             $paginate = 10;
         }
 
-        if ($isAdmin == 'false') {
-            $data = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan')
-                ->where('status', $status)
-                ->where('id_user', $id_user)
-                ->when($search, function ($query) use ($search) {
-                    $query->where(function ($sub_query) use ($search) {
-                        $sub_query->where('nama_pemancingan', 'LIKE', "%{$search}%")
-                            ->orWhere('deskripsi', 'LIKE', "%{$search}%");
-                    });
-                })->when(($order && $by), function ($query) use ($order, $by) {
-                    $query->orderBy($order, $by);
-                })->paginate($paginate);
+        $data = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan')
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($sub_query) use ($search) {
+                    $sub_query->where('nama_pemancingan', 'LIKE', "%{$search}%")
+                        ->orWhere('deskripsi', 'LIKE', "%{$search}%");
+                });
+            })
+            ->orderBy('updated_at', 'asc')
+            ->paginate($paginate);
 
-            $query_string = [
-                'search' => $search,
-                'order' => $order,
-                'by' => $by,
-            ];
+        return response()->json([
+            'message' => 'Getting Pemancingan Data is Successfully!',
+            'status' => 200,
+            'data' => $data,
+        ], 200);
+    }
 
-            $data->appends($query_string);
-
-            return response()->json([
-                'message' => 'Getting Pemancingan Data is Successfully!',
-                'status' => 200,
-                'data' => $data,
-            ], 200);
+    public function getPemancinganForUser(Request $request)
+    {
+        $search = $request->get('search');
+        $latitude = $request->get('latitude');
+        $longitude = $request->get('longitude');
+        if ($request->get('paginate')) {
+            $paginate = $request->get('paginate');
+        } else {
+            $paginate = 10;
         }
-        if ($isAdmin == 'true') {
-            $data = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan')
-                ->where('status', $status)
-                ->when($search, function ($query) use ($search) {
-                    $query->where(function ($sub_query) use ($search) {
-                        $sub_query->where('nama_pemancingan', 'LIKE', "%{$search}%")
-                            ->orWhere('deskripsi', 'LIKE', "%{$search}%");
-                    });
-                })->when(($order && $by), function ($query) use ($order, $by) {
-                    $query->orderBy($order, $by);
-                })->paginate($paginate);
 
-            $query_string = [
-                'search' => $search,
-                'order' => $order,
-                'by' => $by,
-            ];
+        $data = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan')
+            ->where('status', 1)
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($sub_query) use ($search) {
+                    $sub_query->where('nama_pemancingan', 'LIKE', "%{$search}%");
+                });
+            })
+            ->orderByRaw(
+                "6371 * acos(cos(radians(?)) * cos(radians(latitude)) * cos(radians(longitude) - radians(?)) + sin(radians(?)) * sin(radians(latitude)))",
+                [$latitude, $longitude, $latitude]
+            )
+            ->paginate($paginate);
 
-            $data->appends($query_string);
+        return response()->json([
+            'message' => 'Getting Pemancingan Data is Successfully!',
+            'status' => 200,
+            'data' => $data,
+        ], 200);
+    }
 
-            return response()->json([
-                'message' => 'Getting Pemancingan Data is Successfully!',
-                'status' => 200,
-                'data' => $data,
-            ], 200);
+
+
+    public function getPemancinganByUser(Request $request, $id_user)
+    {
+        $search = $request->get('search');
+
+        if ($request->get('paginate')) {
+            $paginate = $request->get('paginate');
+        } else {
+            $paginate = 10;
         }
+
+        $data = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan')
+            ->where('id_user', $id_user)
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($sub_query) use ($search) {
+                    $sub_query->where('nama_pemancingan', 'LIKE', "%{$search}%")
+                        ->orWhere('deskripsi', 'LIKE', "%{$search}%");
+                });
+            })
+            ->orderBy('updated_at', 'desc')
+            ->paginate($paginate);
+
+        return response()->json([
+            'message' => 'Getting Pemancingan Data is Successfully!',
+            'status' => 200,
+            'data' => $data,
+        ], 200);
     }
 
     /**

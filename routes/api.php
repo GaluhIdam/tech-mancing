@@ -41,6 +41,10 @@ Route::middleware('auth:sanctum')->group(
 
         //Getting Pemancingan
         Route::get('pemancingan', [PemancinganController::class, 'index']);
+        //Getting Pemancingan By User
+        Route::get('pemancingan-by-user/{id_user}', [PemancinganController::class, 'getPemancinganByUser']);
+        //Getting Pemancingan For User
+        Route::get('pemancingan-for-user', [PemancinganController::class, 'getPemancinganForUser']);
         //Getting Pemancingan by ID
         Route::get('pemancingan/{id}', [PemancinganController::class, 'show']);
         //Creating Pemancingan
