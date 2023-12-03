@@ -11,13 +11,13 @@ class KomentarRateController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request, $id)
     {
         $orderBy = $request->get('orderBy', 'id');  // Default to 'id' if not provided
         $sortBy = $request->get('sortBy', 'desc');  // Default to 'desc' if not provided
         $paginate = $request->get('paginate', 10);  // Default to 10 if not provided
 
-        $data = KomentarRate::orderBy($orderBy, $sortBy)->paginate($paginate);
+        $data = KomentarRate::with('userKomentar')->where('id_pemancingan', $id)->orderBy($orderBy, $sortBy)->paginate($paginate);
 
         return response()->json([
             'message' => 'Getting Komentar Rate',

@@ -168,7 +168,7 @@ class PemancinganController extends Controller
      */
     public function show($id)
     {
-        $data = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan')->where('id', $id)->first();
+        $data = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan.userKomentar')->where('id', $id)->first();
         if ($data) {
             return response()->json([
                 'message' => 'Getting Pemancingan Data is Successfully!',

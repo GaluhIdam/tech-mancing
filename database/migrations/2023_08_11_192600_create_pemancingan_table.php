@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('buka');
             $table->string('tutup');
             $table->string('nama_pemancingan');
-            $table->string('deskripsi');
+            $table->text('deskripsi');
 
             $table->string('id_provinsi');
             $table->string('provinsi');

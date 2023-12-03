@@ -45,6 +45,6 @@ class Pemancingan extends Model
 
     public function komentarPemancingan()
     {
-        return $this->hasMany(KomentarRate::class, "id");
+        return $this->hasMany(KomentarRate::class, "id_pemancingan", "id")->orderBy('created_at', 'desc');
     }
 }

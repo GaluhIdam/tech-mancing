@@ -55,7 +55,7 @@ Route::middleware('auth:sanctum')->group(
         Route::delete('pemancingan/{id}', [PemancinganController::class, 'destroy']);
 
         //Getting Komentar Rate
-        Route::get('komentar-rate', [KomentarRateController::class, 'index']);
+        Route::get('komentar-rate/{id}', [KomentarRateController::class, 'index']);
         //Creating Komentar Rate
         Route::post('komentar-rate', [KomentarRateController::class, 'create']);
         //Updating Komentar Rate

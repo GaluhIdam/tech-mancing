@@ -17,4 +17,10 @@ class KomentarRate extends Model
         'komentar',
         'rate'
     ];
+
+
+    public function userKomentar()
+    {
+        return $this->belongsTo(User::class, 'id_user', 'id');
+    }
 }
