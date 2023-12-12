@@ -24,3 +24,5 @@ services:
       MYSQL_PASSWORD: Saynotodream64
     volumes:
       - ./mysql-data:/var/lib/mysql
+      
+  app:
