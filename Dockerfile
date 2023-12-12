@@ -1,34 +1,41 @@
-FROM php:7.4-fpm
+# Use the official PHP image as the base image
+FROM php:8.1.0-fpm
 
-# Arguments defined in docker-compose.yml
-ARG user
-ARG uid
+# Set working directory
+WORKDIR /var/www/html
 
-# Install system dependencies
+# Install dependencies
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
+    build-essential \
     libpng-dev \
+    libjpeg62-turbo-dev \
     libonig-dev \
     libxml2-dev \
+    libzip-dev \
     zip \
-    unzip
-
-# Clear cache
-RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+    unzip \
+    curl
 
 # Install PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Get latest Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Create system user to run Composer and Artisan Commands
-RUN useradd -G www-data,root -u $uid -d /home/$user $user
-RUN mkdir -p /home/$user/.composer && \
-    chown -R $user:$user /home/$user
+# Copy application files to the container
+COPY . /var/www/html
 
-# Set working directory
-WORKDIR /var/www
+# Install Laravel dependencies
+RUN composer install --no-interaction
 
-USER $user
+# Generate Laravel application key
+RUN php artisan key:generate
+
+# Set permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Expose port 9000 for PHP-FPM
+EXPOSE 9000
+
+# Start PHP-FPM
+CMD ["php-fpm"]
