@@ -11,7 +11,6 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
       - mysql
-      - app
     networks:
       - tech-mancing-network
 
@@ -29,8 +28,6 @@ services:
       - ./mysql-data:/var/lib/mysql
     networks:
       - tech-mancing-network
-
-  app:
 
 volumes:
   mysql-data:
