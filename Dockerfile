@@ -25,12 +25,6 @@ COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
 # Enable the custom Apache configuration
 RUN a2ensite 000-default
 
-# Copy the application code
-COPY . .
-
-# Install Composer dependencies
-RUN composer install --optimize-autoloader --no-dev
-
 # Set the correct permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
