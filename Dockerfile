@@ -35,6 +35,9 @@ RUN composer install --optimize-autoloader --no-dev
 # Copy the application code
 COPY . .
 
+# Copy the artisan file
+COPY artisan ./
+
 # Set the correct permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html
