@@ -30,6 +30,8 @@ services:
     networks:
       - tech-mancing-network
 
+  app:
+
 volumes:
   mysql-data:
 
