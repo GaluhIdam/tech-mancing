@@ -35,7 +35,7 @@ RUN composer install --optimize-autoloader --no-dev
 # Copy the application code
 COPY . .
 
-# Copy the artisan file
+# Make sure the "artisan" file is present
 COPY artisan ./
 
 # Set the correct permissions
