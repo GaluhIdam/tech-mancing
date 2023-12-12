@@ -11,9 +11,6 @@ RUN apt-get update && apt-get install -y \
     git \
     nginx
 
-# Set noninteractive mode during package installation
-ENV DEBIAN_FRONTEND noninteractive
-
 # Install PHP extensions
 RUN docker-php-ext-install zip pdo_mysql
 
@@ -31,6 +28,7 @@ COPY composer.json composer.lock ./
 
 # Install Composer dependencies
 RUN composer install --optimize-autoloader --no-dev
+RUN composer update
 
 # Copy the application code
 COPY . .
