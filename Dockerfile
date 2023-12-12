@@ -32,6 +32,9 @@ COPY composer.json composer.lock ./
 # Install Composer dependencies
 RUN composer install --optimize-autoloader --no-dev
 
+# Copy the application code
+COPY . .
+
 # Set the correct permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html
