@@ -1,40 +1,26 @@
-# Use an official PHP runtime as a parent image
-FROM php:7.4-apache
+FROM php:7.3-fpm
 
-# Set the working directory to /var/www/html
-WORKDIR /var/www/html
-
-# Install dependencies
-RUN apt-get update && \
-    apt-get install -y \
+RUN apt-get update && apt-get install -y \
+    openssl \
+    libssl-dev \
+    libxml2-dev \
     libzip-dev \
-    unzip \
-    && docker-php-ext-install zip
+    libpng-dev \
+    libonig-dev \
+    libjpeg-dev \
+    && docker-php-ext-install -j$(nproc) openssl pdo_mysql mbstring zip tokenizer xml ctype json
 
-# Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Enable Apache modules and configure Apache
-RUN a2enmod rewrite
-COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
+WORKDIR /var/www/html
 
-# Copy the composer.json and composer.lock
-COPY composer.json composer.lock ./
+COPY .env.example .env
+RUN php artisan key:generate
 
-# Install project dependencies
-RUN composer install --no-scripts --no-autoloader
+COPY . /var/www/html
 
-# Copy the application code
-COPY . .
+RUN composer install --no-dev --optimize-autoloader
 
-# Generate the autoload files and optimize Composer autoloader
-RUN composer dump-autoload --optimize
+RUN php artisan migrate --force
 
-# Set permissions
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
-
-# Expose port 80
-EXPOSE 80
-
-# Start Apache
-CMD ["apache2-foreground"]
+CMD ["php-fpm"]
