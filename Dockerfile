@@ -26,11 +26,15 @@ RUN rm /var/www/html/index.nginx-debian.html
 # Copy the Nginx configuration
 COPY nginx.conf /etc/nginx/sites-available/default
 
+# Copy the composer.json and composer.lock
+COPY composer.json composer.lock ./
+
 # Install Composer dependencies
 RUN composer install --optimize-autoloader --no-dev
 
 # Set the correct permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html
 
 # Expose port 80
 EXPOSE 80
