@@ -1,4 +1,4 @@
-FROM php:7.3-fpm
+FROM php:8.1-fpm
 
 RUN apt-get update && apt-get install -y \
     openssl \
@@ -20,7 +20,5 @@ RUN php artisan key:generate
 COPY . /var/www/html
 
 RUN composer install --no-dev --optimize-autoloader
-
-RUN php artisan migrate --force
 
 CMD ["php-fpm"]
