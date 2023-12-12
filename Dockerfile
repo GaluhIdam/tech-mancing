@@ -19,6 +19,12 @@ RUN a2enmod rewrite
 # Install Composer globally
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Copy the custom Apache configuration
+COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
+
+# Enable the custom Apache configuration
+RUN a2ensite 000-default
+
 # Copy the application code
 COPY . .
 
