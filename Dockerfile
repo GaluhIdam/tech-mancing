@@ -27,8 +27,8 @@ COPY nginx.conf /etc/nginx/sites-available/default
 COPY composer.json composer.lock ./
 
 # Install Composer dependencies
-RUN composer install --optimize-autoloader --no-dev
 RUN composer update
+RUN composer install --optimize-autoloader --no-dev
 
 # Copy the application code
 COPY . .
