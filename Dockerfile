@@ -1,5 +1,5 @@
 # Use the official PHP image with Apache
-FROM php:8.1-fpm
+FROM php:8.1-apache
 
 # Set the working directory
 WORKDIR /var/www/html
@@ -38,4 +38,4 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 EXPOSE 80
 
 # Start Apache
-CMD ["php-fpm"]
+CMD ["apache2-foreground"]
