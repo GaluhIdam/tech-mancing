@@ -8,7 +8,11 @@ WORKDIR /var/www/html
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     unzip \
-    git
+    git \
+    nginx
+
+# Set noninteractive mode during package installation
+ENV DEBIAN_FRONTEND noninteractive
 
 # Install PHP extensions
 RUN docker-php-ext-install zip pdo_mysql
@@ -16,17 +20,11 @@ RUN docker-php-ext-install zip pdo_mysql
 # Install Composer globally
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copy the Nginx configuration
-COPY nginx.conf /etc/nginx/sites-available/default
-
-# Install Nginx
-RUN apt-get install -y nginx
-
 # Remove the default Nginx index.html
 RUN rm /var/www/html/index.nginx-debian.html
 
-# Copy the application code
-COPY . .
+# Copy the Nginx configuration
+COPY nginx.conf /etc/nginx/sites-available/default
 
 # Install Composer dependencies
 RUN composer install --optimize-autoloader --no-dev
