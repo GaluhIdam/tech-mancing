@@ -16,10 +16,10 @@ return new class extends Migration
             $table->unsignedBigInteger('id_pemancingan');
             $table->unsignedBigInteger('id_user');
             $table->string('gambar');
-            $table->string('path');
-            $table->string('nama_acara');
-            $table->string('deskripsi');
-            $table->string('grand_prize');
+            $table->text('path');
+            $table->text('nama_acara');
+            $table->text('deskripsi');
+            $table->text('grand_prize');
             $table->date('mulai');
             $table->date('akhir');
             $table->boolean('status')->nullable();

@@ -282,4 +282,18 @@ class PemancinganController extends Controller
             return response('Image not found', 404);
         }
     }
+
+    public function aprroveReject(Request $request, $id)
+    {
+        $findData = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan.userKomentar')->where('id', $id)->first();
+        $findData->update([
+            'status' => $request->get('status'),
+            'pesan' => $request->get('pesan')
+        ]);
+        return response()->json([
+            'message' => 'Pemancingan Updated!',
+            'status' => 200,
+            'data' => $findData
+        ]);
+    }
 }

@@ -15,11 +15,20 @@ class AcaraController extends Controller
      */
     public function index(Request $request)
     {
-        $orderBy = $request->get('orderBy', 'id');
-        $sortBy = $request->get('sortBy', 'desc');
-        $paginate = $request->get('paginate', 10);
+        $search = $request->get('search');
+        if ($request->get('page') && $request->get('paginate')) {
+            $paginate = $request->get('paginate');
+        } else {
+            $paginate = 10;
+        }
 
-        $data = Acara::orderBy($orderBy, $sortBy)->paginate($paginate);
+        $data = Acara::with('pemancinganAcara')
+            ->where('status', 1)
+            ->when($search, function ($query) use ($search) {
+                $query->where('nama_acara', 'like', '%' . $search . '%')
+                    ->orWhere('deskripsi',  'like', '%' . $search . '%');
+            })
+            ->orderBy('updated_at', 'desc')->paginate($paginate);
 
         return response()->json([
             'message' => 'Getting Acara',
