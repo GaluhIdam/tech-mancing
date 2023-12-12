@@ -1,37 +1,36 @@
-# Use the official PHP image with Apache
-FROM php:8.1-apache
+# Use an official PHP runtime as a parent image
+FROM php:7.4-apache
 
-# Set the working directory
+# Set the working directory to /var/www/html
 WORKDIR /var/www/html
 
 # Install dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    apt-get install -y \
     libzip-dev \
     unzip \
-    git
+    && docker-php-ext-install zip
 
-# Install PHP extensions
-RUN docker-php-ext-install zip pdo_mysql
-
-# Enable Apache modules
-RUN a2enmod rewrite
-
-# Install Composer globally
+# Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Copy the custom Apache configuration
+# Enable Apache modules and configure Apache
+RUN a2enmod rewrite
 COPY apache-config.conf /etc/apache2/sites-available/000-default.conf
 
-# Enable the custom Apache configuration
-RUN a2ensite 000-default
+# Copy the composer.json and composer.lock
+COPY composer.json composer.lock ./
+
+# Install project dependencies
+RUN composer install --no-scripts --no-autoloader
 
 # Copy the application code
 COPY . .
 
-# Install Composer dependencies
-RUN composer install --optimize-autoloader --no-dev
+# Generate the autoload files and optimize Composer autoloader
+RUN composer dump-autoload --optimize
 
-# Set the correct permissions
+# Set permissions
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Expose port 80
