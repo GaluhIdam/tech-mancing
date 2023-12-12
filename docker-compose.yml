@@ -11,8 +11,6 @@ services:
       - ./nginx/conf.d:/etc/nginx/conf.d
     depends_on:
       - mysql
-    networks:
-      - tech-mancing-network
 
   mysql:
     container_name: mysql-tech-mancing-db
@@ -26,11 +24,3 @@ services:
       MYSQL_PASSWORD: Saynotodream64
     volumes:
       - ./mysql-data:/var/lib/mysql
-    networks:
-      - tech-mancing-network
-
-volumes:
-  mysql-data:
-
-networks:
-  tech-mancing-network:
