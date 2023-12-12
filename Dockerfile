@@ -8,20 +8,21 @@ WORKDIR /var/www/html
 RUN apt-get update && apt-get install -y \
     libzip-dev \
     unzip \
-    git &&
-    docker-php-ext-install zip pdo_mysql &&
-    a2enmod rewrite
+    git
+
+# Install PHP extensions
+RUN docker-php-ext-install zip pdo_mysql
+
+# Enable Apache modules
+RUN a2enmod rewrite
 
 # Install Composer globally
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Install dependencies
-RUN composer install --optimize-autoloader --no-dev
-
 # Copy the application code
 COPY . .
 
-# Install dependencies
+# Install Composer dependencies
 RUN composer install --optimize-autoloader --no-dev
 
 # Set the correct permissions
