@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('id_pemancingan');
             $table->unsignedBigInteger('id_user');
-            $table->string('gambar');
+            $table->text('gambar');
             $table->text('path');
             $table->text('nama_acara');
             $table->text('deskripsi');
@@ -23,6 +23,7 @@ return new class extends Migration
             $table->date('mulai');
             $table->date('akhir');
             $table->boolean('status')->nullable();
+            $table->text('pesan')->nullable();
             $table->timestamps();
 
             $table->foreign('id_pemancingan')->references('id')->on('pemancingan');

@@ -206,4 +206,76 @@ class AcaraController extends Controller
             return response('Image not found', 404);
         }
     }
+
+    public function statsAcara()
+    {
+        $waiting = Acara::where('status', null)->count();
+        $reject = Acara::where('status', 0)->count();
+        $approve = Acara::where('status', 1)->count();
+        return response()->json([
+            'message' => 'Acara Stats!',
+            'status' => 200,
+            'data' => [
+                'menunggu' => $waiting,
+                'terima' => $approve,
+                'tolak' => $reject,
+            ],
+        ], 200, [], JSON_FORCE_OBJECT);
+    }
+
+
+    public function getAcaraForAdmin(Request $request, $filter)
+    {
+        $search = $request->get('search');
+
+        if ($request->get('paginate')) {
+            $paginate = $request->get('paginate');
+        } else {
+            $paginate = 10;
+        }
+
+        if ($filter == 'null') {
+            $data = Acara::with('pemancinganAcara')
+                ->where('status', null)
+                ->when($search, function ($query) use ($search) {
+                    $query->where(function ($sub_query) use ($search) {
+                        $sub_query->where('nama_acara', 'LIKE', "%{$search}%")
+                            ->orWhere('deskripsi', 'LIKE', "%{$search}%");
+                    });
+                })
+                ->orderBy('updated_at', 'desc')
+                ->paginate($paginate);
+        } else {
+            $data = Acara::with('pemancinganAcara')
+                ->where('status', $filter)
+                ->when($search, function ($query) use ($search) {
+                    $query->where(function ($sub_query) use ($search) {
+                        $sub_query->where('nama_acara', 'LIKE', "%{$search}%")
+                            ->orWhere('deskripsi', 'LIKE', "%{$search}%");
+                    });
+                })
+                ->orderBy('updated_at', 'desc')
+                ->paginate($paginate);
+        }
+
+        return response()->json([
+            'message' => 'Getting Acara Data is Successfully!',
+            'status' => 200,
+            'data' => $data,
+        ], 200);
+    }
+
+    public function aprroveReject(Request $request, $id)
+    {
+        $findData = Acara::with('pemancinganAcara')->where('id', $id)->first();
+        $findData->update([
+            'status' => $request->get('status'),
+            'pesan' => $request->get('pesan')
+        ]);
+        return response()->json([
+            'message' => 'Acara Updated!',
+            'status' => 200,
+            'data' => $findData
+        ]);
+    }
 }

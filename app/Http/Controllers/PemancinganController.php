@@ -296,4 +296,61 @@ class PemancinganController extends Controller
             'data' => $findData
         ]);
     }
+
+    public function statsPemancingan()
+    {
+        $waiting = Pemancingan::where('status', null)->count();
+        $reject = Pemancingan::where('status', 0)->count();
+        $approve = Pemancingan::where('status', 1)->count();
+        return response()->json([
+            'message' => 'Pemancingan Stats!',
+            'status' => 200,
+            'data' => [
+                'menunggu' => $waiting,
+                'terima' => $approve,
+                'tolak' => $reject,
+            ],
+        ], 200, [], JSON_FORCE_OBJECT);
+    }
+
+    public function getPemancinganForAdmin(Request $request, $filter)
+    {
+        $search = $request->get('search');
+
+        if ($request->get('paginate')) {
+            $paginate = $request->get('paginate');
+        } else {
+            $paginate = 10;
+        }
+
+        if ($filter == 'null') {
+            $data = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan')
+                ->where('status', null)
+                ->when($search, function ($query) use ($search) {
+                    $query->where(function ($sub_query) use ($search) {
+                        $sub_query->where('nama_pemancingan', 'LIKE', "%{$search}%")
+                            ->orWhere('deskripsi', 'LIKE', "%{$search}%");
+                    });
+                })
+                ->orderBy('updated_at', 'desc')
+                ->paginate($paginate);
+        } else {
+            $data = Pemancingan::with('userPemancingan', 'acaraPemancingan', 'komentarPemancingan')
+                ->where('status', $filter)
+                ->when($search, function ($query) use ($search) {
+                    $query->where(function ($sub_query) use ($search) {
+                        $sub_query->where('nama_pemancingan', 'LIKE', "%{$search}%")
+                            ->orWhere('deskripsi', 'LIKE', "%{$search}%");
+                    });
+                })
+                ->orderBy('updated_at', 'desc')
+                ->paginate($paginate);
+        }
+
+        return response()->json([
+            'message' => 'Getting Pemancingan Data is Successfully!',
+            'status' => 200,
+            'data' => $data,
+        ], 200);
+    }
 }

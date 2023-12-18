@@ -21,7 +21,8 @@ class Acara extends Model
         'grand_prize',
         'mulai',
         'akhir',
-        'status'
+        'status',
+        'pesan'
     ];
 
     public function pemancinganAcara()

@@ -55,6 +55,9 @@ Route::middleware('auth:sanctum')->group(
         Route::delete('pemancingan/{id}', [PemancinganController::class, 'destroy']);
         Route::put('pemancingan-status/{id}', [PemancinganController::class, 'aprroveReject']);
 
+        Route::get('pemancingan-stats', [PemancinganController::class, 'statsPemancingan']);
+        Route::get('pemancingan-admin/{filter}', [PemancinganController::class, 'getPemancinganForAdmin']);
+
         //Getting Komentar Rate
         Route::get('komentar-rate/{id}', [KomentarRateController::class, 'index']);
         //Creating Komentar Rate
@@ -73,7 +76,11 @@ Route::middleware('auth:sanctum')->group(
         Route::post('acara', [AcaraController::class, 'create']);
         //Updating Acara
         Route::post('acara/{id}', [AcaraController::class, 'update']);
+        Route::put('acara-approve/{id}', [AcaraController::class, 'aprroveReject']);
         //Deleting Acara
         Route::delete('acara/{id}', [AcaraController::class, 'destroy']);
+
+        Route::get('acara-stats', [AcaraController::class, 'statsAcara']);
+        Route::get('acara-admin/{filter}', [AcaraController::class, 'getAcaraForAdmin']);
     }
 );
